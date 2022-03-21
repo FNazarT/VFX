@@ -9,11 +9,13 @@ public class ToggleFireParticle : MonoBehaviour
     public KeyCode toggleKey = KeyCode.Space;
 
     private ParticleSystem fireParticle;
+    public ParticleSystem rainParticle;
     public ParticleSystem igniteParticle;
     public ParticleSystem extinguishParticle;
     public GameObject pointLight;
 
-    bool isPlaying = true;
+    bool isFirePlaying = true;
+    bool isRainPlaying = false;
 
     private void Start()
     {
@@ -24,13 +26,13 @@ public class ToggleFireParticle : MonoBehaviour
     {
         if (Input.GetKeyDown(toggleKey))
         {
-            if(isPlaying)
+            if(isFirePlaying)
             {
                 fireParticle.Stop();
                 pointLight.SetActive(false);
                 if (extinguishParticle != null)
                     extinguishParticle.Play();
-                isPlaying = false;
+                isFirePlaying = false;
             } 
             else
             {
@@ -38,8 +40,39 @@ public class ToggleFireParticle : MonoBehaviour
                 pointLight.SetActive(true);
                 if (igniteParticle != null)
                     igniteParticle.Play();
-                isPlaying = true;
+                isFirePlaying = true;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (isRainPlaying)
+            {
+                rainParticle.Stop();
+                isRainPlaying = false;
+            }
+            else
+            {
+                rainParticle.Play();
+                isRainPlaying = true;
+            }                
+        }
+    }
+
+    private void OnParticleCollision(GameObject other)
+    {
+        if (isFirePlaying)
+        {
+            Invoke(nameof(ExtinguishFire), 1f);
+        }
+    }
+
+    private void ExtinguishFire()
+    {
+        fireParticle.Stop();
+        pointLight.SetActive(false);
+        if (extinguishParticle != null)
+            extinguishParticle.Play();
+        isFirePlaying = false;
     }
 }
